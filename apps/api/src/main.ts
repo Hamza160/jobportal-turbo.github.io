@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   dotenv.config();
@@ -10,6 +11,7 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
     credentials: true,
   });
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 8000);
 }
 

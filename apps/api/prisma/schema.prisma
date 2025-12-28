@@ -35,7 +35,7 @@ model User {
   profileSkills             String[]
   profileResume             String?
   profileResumeOriginalName String?
-  profileCompanyId          String        @db.ObjectId
+  profileCompanyId          String?       @db.ObjectId
   profilePhoto              String        @default("")
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt

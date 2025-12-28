@@ -24,7 +24,7 @@ export class RegisterUserDto {
     @IsOptional()
     @IsArray()
     @IsString({each: true})
-    profileSkills?: string;
+    profileSkills?: string[];
 
     @IsOptional()
     @IsUrl()
@@ -67,7 +67,7 @@ export class UpdateUserDto {
     @IsOptional()
     @IsArray()
     @IsString({each: true})
-    profileSkills?: string;
+    profileSkills?: string[];
 
     @IsOptional()
     @IsUrl()
@@ -85,6 +85,19 @@ export class UpdateUserDto {
     @IsString()
     role?: any
 }
+
+
+export class LoginDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    password: string;
+
+    @IsString()
+    role: string;
+}
+
 
 export class UserResponseDto {
     id: string;
