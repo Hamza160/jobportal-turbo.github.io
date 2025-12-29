@@ -1,6 +1,6 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {PrismaService} from '../prisma/prisma.service';
-import {RegisterUserDto} from './dto/user.dto';
+import {RegisterUserDto, UpdateUserDto} from './dto/user.dto';
 import {JwtService} from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -78,10 +78,33 @@ export class UserService {
         };
     }
 
-  async logout(): Promise<{ message: string; success: boolean }> {
+    async logout(): Promise<{ message: string; success: boolean }> {
         return {
-      success: true,
-      message: 'Logged out successfully',
+            success: true,
+            message: 'Logged out successfully',
         };
+    }
+
+    async updateProfile(id: string, updateUserDto: UpdateUserDto) {
+        const {fullName, email, phoneNumber, profileBio, profileSkills, profileResume, profilePhoto} = updateUserDto;
+
+        if (!fullName || !email || !phoneNumber || !profileBio || !profileSkills) {
+            throw new BadRequestException('All fields are required');
+        }
+
+        const user = await this.prisma.user.update({
+            where: {id},
+            data: {
+        fullName,
+        email,
+        phoneNumber,
+        profileBio,
+        profileSkills,
+        profileResume,
+        profilePhoto,
+            }
+        })
+
+        return user;
     }
 }
