@@ -1,6 +1,6 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {PrismaService} from "../prisma/prisma.service";
-import {RegisterCompanyDto} from "./dto/company.dto";
+import {RegisterCompanyDto, UpdateCompanyDto} from "./dto/company.dto";
 
 @Injectable()
 export class CompanyService {
@@ -24,5 +24,49 @@ export class CompanyService {
             }
         })
 
+    }
+
+    async getCompanies(userId: string) {
+        return this.prisma.company.findMany({
+            where: {
+                userId
+            }
+        })
+    }
+
+    async getCompanyById(id: string) {
+        const company = this.prisma.company.findUnique({
+            where:{id}
+        })
+
+        if (!company) {
+            throw new NotFoundException('Company not found');
+        }
+
+        return company
+    }
+
+    async deleteCompany(id: string) {
+        const company = this.prisma.company.delete({
+            where:{id}
+        })
+
+        if (!company) {
+            throw new NotFoundException('Company not found');
+        }
+
+        return company
+    }
+
+    async updateCompany(id: string, updateCompanyDto: UpdateCompanyDto) {
+        const company = await this.prisma.company.update({
+            where:{id},
+            data:updateCompanyDto
+        })
+
+        if (!company) {
+            throw new NotFoundException('Company not found');
+        }
+        return company
     }
 }
