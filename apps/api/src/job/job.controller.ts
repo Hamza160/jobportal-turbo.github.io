@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Query, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Query, Req, UseGuards} from '@nestjs/common';
 import {JobService} from "./job.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {PostJobDto} from "./dto/job.dto";
@@ -31,5 +31,53 @@ export class JobController {
         }
     }
 
+    @Get(':id')
+    async getJobById(@Param('id') id: string) {
+        const job = await this.jobService.getJobById(id)
 
+        return {
+            success: true,
+            job
+        }
+    }
+
+    // get job by userId
+    @UseGuards(JwtAuthGuard)
+    @Get('admin')
+    async getJobByUserId(@Req() req) {
+        const userId = req.user.id;
+        const result = await this.jobService.getJobByUserId(userId);
+
+        return {
+            success: true,
+            result
+        }
+    }
+
+    // Add Favourite Jobs
+    @UseGuards(JwtAuthGuard)
+    @Post('favourite/:id')
+    async createFavouriteJob(@Param('id') jobId: string, @Req() req) {
+        const userId = req.user.id;
+        const result = await this.jobService.createFavourite(jobId, userId);
+
+        return {
+            success: true,
+            result
+        }
+    }
+
+    // get All Favourites
+    @UseGuards(JwtAuthGuard)
+    @Get('favourites')
+    async getFavouritesJob(@Req() req: any) {
+        const userId = req.user.id as string;
+        const result = await this.jobService.getFavourites(userId);
+
+        return {
+            success: true,
+            message: `Jobs fetced successfully.`,
+            result
+        }
+    }
 }

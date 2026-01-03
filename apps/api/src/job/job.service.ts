@@ -90,4 +90,82 @@ export class JobService {
 
         return jobs;
     }
+
+    async getJobById(id: string) {
+        const job = await this.prisma.job.findUnique({
+            where: {id}
+        })
+
+        if (!job) {
+            throw new NotFoundException("Job not found");
+        }
+
+        return job;
+    }
+
+    async getJobByUserId(createdById: string) {
+        const job = await this.prisma.job.findMany({
+            where: {createdById},
+            include: {company: true},
+            orderBy: {createdAt: 'desc'}
+        })
+
+        if (!job) {
+            throw new NotFoundException("Job not found");
+        }
+
+        return job;
+    }
+
+    // create favourite
+    async createFavourite(jobId: string, userId: string) {
+        let newFav: any;
+        try {
+            const fav = await this.prisma.favourite.findFirst({
+                where: {
+                    jobId,
+                    userId,
+                }
+            })
+            if (fav) {
+                throw new NotFoundException("This job is already in favourite");
+            }
+
+            newFav = await this.prisma.favourite.create({
+                data: {
+                    userId,
+                    jobId,
+                }
+            });
+
+            if (!newFav) {
+                throw new NotFoundException("Job not added in favourite");
+            }
+            return newFav;
+        } catch (err) {
+            throw new NotFoundException("Job not added in favourite");
+        }
+    }
+
+    async getFavourites(userId: any) {
+        try {
+            const jobs = await this.prisma.favourite.findMany({
+                where: {
+                    userId,
+                },
+                include: {
+                    job: {
+                        include: {company: true}
+                    }
+                }
+            })
+
+            if (!jobs?.length) {
+                throw new NotFoundException("Job not found");
+            }
+            return jobs;
+        } catch (err) {
+            throw new NotFoundException("Job not found");
+        }
+    }
 }
