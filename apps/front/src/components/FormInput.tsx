@@ -7,7 +7,7 @@ type Props = {
     type: string;
     name: string;
     value?: string;
-    placeholder: string;
+    placeholder?: string;
     onChange?: () => void;
     defaultValue?: string;
 
