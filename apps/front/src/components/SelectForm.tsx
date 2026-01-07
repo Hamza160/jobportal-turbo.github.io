@@ -11,7 +11,7 @@ import {
 const SelectForm = ({name, placeholder, list}) => {
   return (
       <Select name={name}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full  my-1">
               <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>
