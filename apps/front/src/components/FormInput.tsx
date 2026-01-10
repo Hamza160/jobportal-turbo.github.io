@@ -10,7 +10,6 @@ type Props = {
     placeholder?: string;
     onChange?: () => void;
     defaultValue?: string;
-
 }
 
 const FormInput = ({label, type, value, onChange, name, placeholder, defaultValue}: Props) => {

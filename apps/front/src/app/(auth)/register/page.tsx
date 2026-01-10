@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, {useEffect} from 'react';
 import FormInput from "@/components/FormInput";
 import {Label} from "@/components/ui/label";
 import {AvatarImage, Avatar, AvatarFallback} from "@/components/ui/avatar";
@@ -11,19 +11,24 @@ import {register} from "@/actions/user";
 import {useLocalStorage} from "@mantine/hooks";
 import uploadFile from "@/lib/uploadFile";
 import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 export default function RegisterPage() {
     const [profile, setProfile] = React.useState({profileBio: "", profilePhoto: ""})
     const [resume, setResume] = React.useState({profileResume: "", profileResumeOriginalName: ""})
-
+    const router = useRouter()
     const [user] = useLocalStorage({
         key: 'userData',
         defaultValue: {},
     });
 
-    const handleSubmit = async (formData: any) => {
-        const response = await register(formData, profile, resume);
-    }
+    useEffect(() => {
+        if (user?.role === 'recruiter') {
+            router.push("/admin/companies");
+        } else if (user?.role === 'student') {
+            router.push("/");
+        }
+    }, [])
 
     const handleUpload = async (event, type) => {
         const file = event.target.files?.[0];
@@ -42,9 +47,23 @@ export default function RegisterPage() {
         }
     }
 
+    const handleSubmit = async (formData: any) => {
+        const response = await register(formData, profile, resume);
+        if (response?.error) {
+            toast?.error(response?.error)
+        } else {
+            router.push("/login");
+        }
+    }
+
     return (
         <div className="flex items-center justify-center max-w-7xl mx-auto mb-12">
-            <form action={handleSubmit} className="w-1/2 border border-gray-200 rounded p-4 bg-gray-100 my-6 mx-auto">
+            <form onSubmit={async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(e.currentTarget);
+                await handleSubmit(formData);
+            }} className="w-1/2 border border-gray-200 rounded p-4 bg-gray-100 my-6 mx-auto">
                 <h1 className="font-bold text-2xl mb-4 text-yellow-400 text-center flex flex-col gap-2">Sign Up</h1>
                 <FormInput
                     label={'Full Name'}
@@ -75,7 +94,7 @@ export default function RegisterPage() {
                         <Label htmlFor="profilePhoto">Profile Photo</Label>
                         <div className={"relative h-20 w-20 mt-1"}>
                             <Avatar className="w-full h-full">
-                                <AvatarImage src={profile?.profilePhoto} alt={"Image"} />
+                                <AvatarImage src={profile?.profilePhoto} alt={"Image"}/>
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                             <XIcon
@@ -102,7 +121,7 @@ export default function RegisterPage() {
                 {resume?.profileResume ? (
                     <>
                         <Label htmlFor="resumeResume">Resume</Label>
-                        <div>
+                        <div className="h-20 relative mt-1">
                             <object data={resume?.profileResume} type="application/pdf" width="50%"
                                     height="50%"></object>
                             <p>Alternative text - include a link <a href={resume?.profileResume}>to the PDF</a></p>
